@@ -10,7 +10,8 @@ import pandas as pd
 # check if creating a new database or using old one
 new = True
 mainfile = None
-dbpath = None  # These three lines are to remove pycharm flagging upcoming lines as a warning
+p = None
+dbpath = None  # These four lines are to remove pycharm flagging upcoming lines as a warning
 if len(sys.argv) < 2:
     new = True
 elif len(sys.argv) == 2:
@@ -25,7 +26,7 @@ if new:
     print('Restart to begin')
     quit(0)
 else:
-    mainfile = decrypt_db(dbpath)
+    mainfile, p = decrypt_db(dbpath)
 
 # parsing the data into a pandas dataframe
 metadata = mainfile.decode().split('\n')[0].split(',')
