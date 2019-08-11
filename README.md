@@ -2,6 +2,22 @@
 
 This is the homepage of a homegrown finance app for home finances, meant for all open-source & homely homies homing about in a quest for a tool to manage their finances. :)
 
+### Why should I use this app?
+I am very glad you asked. Really. Well, there are tons of reasons. Here are some of the good ones:
+
+1. **Feel like a techie, sudo style!** This app is very clunky and unnatural. It has the console open in the background and requires you to click the buttons rather than tab-enter, very cryptic usage pattern, weird old looking UI, along with forcing some options to be answered on the console. Only the coolest programmers use such apps. :)
+2. **Support Education**. If you star this, or download this, contribute to this, or simply use this, at least one person shall be inspired to learn more about the stuff involved in the programming of this app, and in general educate himself (me). That is a very noble task, meant only for truly noble men/women like you. 
+3. **Be a part of bleeding edge software**. Tons of bugs, seriously required UI improvements, unlimited scope for improvement, cool but pointless integrations like cryptography support and an active developer - all the hallmarks of a bleeding edge software.
+4. **Spread Smile(s) and reduce plastic**. Guaranteed one smile per star/download/contribution. Make the world a happier place. Also, developer guarantees recycling at least 1 bottle per download/star/contribution.
+5. **Learn patience, planning for technical contingencies (what if you lose the data), perseverence and meticulousness**. All of these are essential life skills, and the app is created to inculcate these in young men/women of this very value-less era.
+6. **I don't care about home finances in reality as much as I care about pretending to care**. Perfect app for this purpose. Any one wanting to double check if your maintained database is actually good/consistent/honest will give up after getting a feel of the app. Highly secure wool over their eyes.
+7. **This developer has actually taken pains and written all this? I should at least see his app.** Yes, you should. Definitely.
+
+### Bad reasons to use this app
+1.**To rely solely on this app for home financial management** Kind of obvious. Why would anyone rely on a home-finance app to do their home finances anyway?
+2. **Tax returns** No. Please not the t-word.
+3. **Extremely secret alien finances** Although the cryptography is definitely unbreakable (duh), I actually don't have much idea what I'm doing. So I would rather let the aliens do their work themselves or use an alternative app.
+
 ### Explanation of the financial model
 This program uses a weird but hopefully intuitive system (inspired from other Money Management Apps). Every transaction has 4 important descriptors. First, is the **"From"** section, which is one of the *Accounts* (Coming ahead). Next is the **To** section which is either a *Payee* or an *Account*. Next is a **Category** and the final is the **Type**, which is one of the three (*Transfer*, *Minus*, *Plus*).
 
@@ -17,15 +33,19 @@ There is no standard way to model your finances. This is just a rough guide. Fee
 ### Description of the app
 ....upcoming....
 
-### Why should I use this app?
-...upcoming...
-### Bad reasons to use this app
-...upcoming...
+
 ### Upcoming Features
-...upcoming...
-
-
-
+#### Definitely Upcoming
+1. Graphical Analysis tab
+2. Export databse as csv
+3. Change Password
+4. Save button in the UI and auto-save
+5. Support for adding opening balance when adding a new Account
+#### Maybe upcoming
+1. Delete transactions
+2. Budget setup and compare
+3. Different currencies
+4. UI-based password entry
 
 ### Requirements (apart from Python 3.x)
 1. [Cryptography](https://pypi.org/project/cryptography/) (Cool Stuff, I know)
