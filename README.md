@@ -14,7 +14,7 @@ I am very glad you asked. Really. Well, there are tons of reasons. Here are some
 7. **This developer has actually taken pains and written all this? I should at least see his app.** Yes, you should. Definitely.
 
 ### Bad reasons to use this app
-1.**To rely solely on this app for home financial management** Kind of obvious. Why would anyone rely on a home-finance app to do their home finances anyway?
+1. **To rely solely on this app for home financial management** Kind of obvious. Why would anyone rely on a home-finance app to do their home finances anyway?
 2. **Tax returns** No. Please not the t-word.
 3. **Extremely secret alien finances** Although the cryptography is definitely unbreakable (duh), I actually don't have much idea what I'm doing. So I would rather let the aliens do their work themselves or use an alternative app.
 
