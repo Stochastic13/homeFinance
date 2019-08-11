@@ -12,6 +12,7 @@ I am very glad you asked. Really. Well, there are tons of reasons. Here are some
 5. **Learn patience, planning for technical contingencies (what if you lose the data), perseverence and meticulousness**. All of these are essential life skills, and the app is created to inculcate these in young men/women of this very value-less era.
 6. **You (the user) don't care about home finances in reality as much as you care about pretending to care**. Perfect app for this purpose. Any one wanting to double check if your maintained database is actually good/consistent/honest will give up after getting a feel of the app. Highly secure wool over their eyes.
 7. **This developer has actually taken pains and written all this? I should at least see his app.** Yes, you should. Definitely.
+8. **Play hide and seek in the code** Decide on what you want to find in there (say the label corresponding to the date in the viewer). Now set out to go through the 500+ lines to find this particular button without proper comments. A sure treat for adrenaline junkies.
 
 ### Bad reasons to use this app
 1. **To rely solely on this app for home financial management** Kind of obvious. Why would anyone rely on a home-finance app to do their home finances anyway?
