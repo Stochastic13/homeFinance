@@ -10,7 +10,7 @@ I am very glad you asked. Really. Well, there are tons of reasons. Here are some
 3. **Be a part of bleeding edge software**. Tons of bugs, seriously required UI improvements, unlimited scope for improvement, cool but pointless integrations like cryptography support and an active developer - all the hallmarks of a bleeding edge software.
 4. **Spread Smile(s) and reduce plastic**. Guaranteed one smile per star/download/contribution. Make the world a happier place. Also, developer guarantees recycling at least 1 bottle per download/star/contribution.
 5. **Learn patience, planning for technical contingencies (what if you lose the data), perseverence and meticulousness**. All of these are essential life skills, and the app is created to inculcate these in young men/women of this very value-less era.
-6. **I don't care about home finances in reality as much as I care about pretending to care**. Perfect app for this purpose. Any one wanting to double check if your maintained database is actually good/consistent/honest will give up after getting a feel of the app. Highly secure wool over their eyes.
+6. **You (the user) don't care about home finances in reality as much as you care about pretending to care**. Perfect app for this purpose. Any one wanting to double check if your maintained database is actually good/consistent/honest will give up after getting a feel of the app. Highly secure wool over their eyes.
 7. **This developer has actually taken pains and written all this? I should at least see his app.** Yes, you should. Definitely.
 
 ### Bad reasons to use this app
