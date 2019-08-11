@@ -31,17 +31,36 @@ There is no standard way to model your finances. This is just a rough guide. Fee
 ![The model used in the app](demo.png)
 
 ### Description of the app
-....upcoming....
+To run this app, navigate to the folder containing the script files and enter in the console `python homeFinance.py <dbname>` with a `<dbname>` if you want to open an already existing databse or without that to create a new database. It will ask for the password and if successful, will open the GUI in the former case, or will prompt for the name of the new database in the latter case. Either way, you need to be replying in console.
+
+![new and old database](demo_pngs/demo1.png)
+![new and old database2](demo_pngs/demo2.png)
+
+There are currently 3 tabs in the GUI. The first one is to add new accounts (currently start with zero opening balance. You might need a pseudo past-dated transaction to add balance), payees, categories or add a new transaction. The options are self explanatory and the submit buitton provides feedback if the transaction was successfully added or if the entered data failed to validate (date or the amount). You can also delete accounts/payees/categories but that will not remove the transactions and the only way to view them in the viewer is to select all the columns in all the lists. 
+
+![entry form](demo_pngs/demo3.png)
+
+Nest is the viewer. It allows filtering based on what all is selected. Press refresh to load. Select everything to display all transactions. Only the transactions within the date range will be shown.
+
+![viewer](demo_pngs/demo4.png)
+
+Last is the Numeric Analysis tab. Displays almost evrything you might want to know as a summary of transactions within a date range. Opening balance refers to the sum total of the transactions happening before the starting date of the analysis range.
+
+![numeric analysis](demo_pngs/demo5.png)
+
+On quitting the option of saving shall come up in the console. Please do not skip this. Press 'y' and enter to save. Will require your password (I do not know why this feature is there. Seemed cool when I added it. ).
 
 
 ### Upcoming Features
 #### Definitely Upcoming
+0. (0-indexed, as it should be) Code cleanup for readability
 1. Graphical Analysis tab
 2. Export databse as csv
 3. Change Password
 4. Save button in the UI and auto-save
 5. Support for adding opening balance when adding a new Account
 #### Maybe upcoming
+0. Import database data
 1. Delete transactions
 2. Budget setup and compare
 3. Different currencies
