@@ -6,6 +6,9 @@ import sys
 import time
 import numpy as np
 import pandas as pd
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.gridspec import GridSpec
 
 # check if creating a new database or using old one
 new = True
@@ -384,6 +387,147 @@ def numeric_analyze(event=None):  # analyze and summarize the data numericaly
     category_numeric.config(state=DISABLED)
 
 
+def foo_plot(x, df_main, end, start, dates):
+    d1 = {'Payee': 'To', 'Category': 'Category', 'Account': 'From'}
+    d2 = {'Payee': payees, 'Category': categories, 'Account': accounts}
+    gs = GridSpec(2, 2)
+    gs.update(hspace=0.05)
+    ax1 = mainfig.add_subplot(gs[0, 0])
+    ax2 = mainfig.add_subplot(gs[0, 1])
+    ax3 = mainfig.add_subplot(gs[1, :])
+    val_minus = []
+    val_plus = []
+    for i in d2[x]:
+        val_minus.append(
+            np.sum(df_main.loc[np.logical_and(df_main[d1[x]] == i, df_main['Type'] == 'Minus'), 'Amount']))
+        val_plus.append(
+            np.sum(df_main.loc[np.logical_and(df_main[d1[x]] == i, df_main['Type'] == 'Plus'), 'Amount']))
+    vals_plot_m = np.array(val_minus)[np.array(val_minus) > 0]
+    cats_plot_m = np.array(d2[x])[np.array(val_minus) > 0]
+    if len(vals_plot_m) > 9:
+        temp = vals_plot_m.sort()
+        temp = (vals_plot_m >= temp[-9])
+        vals_plot_m = vals_plot_m[temp] + [np.sum(vals_plot_m[np.logical_not(temp)])]
+        cats_plot_m = cats_plot_m[temp] + ['Others']
+    vals_plot_p = np.array(val_plus)[np.array(val_plus) > 0]
+    cats_plot_p = np.array(d2[x])[np.array(val_plus) > 0]
+    if len(vals_plot_p) > 9:
+        temp = vals_plot_p.sort()
+        temp = (vals_plot_p >= temp[-9])
+        vals_plot_p = vals_plot_p[temp] + [np.sum(vals_plot_p[np.logical_not(temp)])]
+        cats_plot_p = cats_plot_p[temp] + ['Others']
+    wedges, texts = ax1.pie(vals_plot_m)
+    ax1.legend(wedges, cats_plot_m, loc='center left', title='Legend', bbox_to_anchor=(1, 0, 0.5, 1))
+    ax1.set_title(x + ' for Minus')
+    wedges, texts = ax2.pie(vals_plot_p)
+    ax2.legend(wedges, cats_plot_p, loc='center left', title='Legend', bbox_to_anchor=(1, 0, 0.5, 1))
+    ax2.set_title(x + ' for Plus')
+    if (end - start) / 3600 / 24 / 7 >= 2:
+        yvals = []
+        cutoffs = [start + j * 7 * 24 * 3600 for j in range(int(round((end - start) / 3600 / 24 / 7)))]
+        for i in d2[x]:
+            subtemp = []
+            for j in range(len(cutoffs)):
+                sel = np.logical_and((df_main.loc[:, d1[x]] == i), np.array(dates >= cutoffs[j]))
+                sel = np.logical_and(sel, np.array(dates < (cutoffs[j] + 7 * 24 * 3600)))
+                df_temp = df_main.loc[sel, :]
+                subtemp.append(
+                    np.sum(df_temp.loc[df_temp['Type'] == status_graph_v.get().split('Focus on ')[1], 'Amount']))
+            yvals.append(subtemp[:])
+        summedcats = np.array(np.sum(np.array(yvals), axis=1))
+        temp = [True for x in d2[x]]
+        if len(summedcats) > 9:
+            temp = np.logical_and((summedcats >= (np.sort(summedcats)[-9])), (summedcats > 0))
+            yvalsnew = np.array(yvals)[temp, :]
+        else:
+            yvalsnew = np.array(yvals)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            yvalsnew[yvalsnew > 0] = (np.array(yvalsnew) / np.sum(np.array(yvalsnew), axis=0) * 100)[yvalsnew > 0]
+        polys = ax3.stackplot(np.arange(0, len(cutoffs)), yvalsnew)
+        ax3.set_title(x + '-wise money flow ' + status_graph_v.get().split('Focus on ')[1] + ' over time')
+        ax3.set_xticklabels(['Week ' + str(j) for j in range(len(cutoffs))])
+        ax3.set_ylabel('Percentage')
+        ax3.set_ylim(0, 100)
+        ax3.legend(polys, np.array(d2[x])[temp].tolist() + ['Others'], loc='upper center',
+                   bbox_to_anchor=(0.5, -0.08), ncol=min((np.sum(temp) + 1), 9))
+
+
+def foo_time(df_early, df_main, end, start, dates):
+    accs = [[] for i in accounts]
+    xtimes = [[] for i in accounts]
+    total = [0]
+    xtotal = [0]
+    for i in range(len(accounts)):
+        accs[i].append(np.sum(df_early.loc[np.logical_and(df_early['Type'] == 'Plus', df_early['From'] == i), 'Amount']) - np.sum(df_early.loc[np.logical_and(df_early['Type'] == 'Minus', df_early['From'] == i), 'Amount']))
+        xtimes[i].append(0)
+        total[0] += accs[i][-1]
+    df_main.loc[:, 'Date'] = dates.astype(float)
+    df_main.sort_values('Date', ascending=True, inplace=True)
+    for j, i in df_main.iterrows():
+        if i[2] != 'Transfer':
+            ind = accounts.index(i[3])
+            accs[ind].append(accs[ind][-1] + {'Minus':-1, 'Plus':1}[i[2]] * i[6])
+            xtimes[ind].append((i[1] - start)/24/3600)
+            total.append(total[-1] + {'Minus':-1, 'Plus':1}[i[2]] * i[6])
+            xtotal.append((i[1] - start)/24/3600)
+        else:
+            ind = accounts.index(i[3])
+            accs[ind].append(accs[ind][-1] - i[6])
+            xtimes[ind].append((i[1] - start) / 24 / 3600)
+            ind = accounts.index(i[4])
+            accs[ind].append(accs[ind][-1] + i[6])
+            xtimes[ind].append((i[1] - start) / 24 / 3600)
+    total.append(total[-1])
+    xtotal.append((end - start)/24/3600)
+    ax = mainfig.add_subplot(111)
+    ax.plot(xtotal, total, '^k-', lw=2, ms=5, label='Total')
+    for i in range(len(accounts)):
+        accs[i].append(accs[i][-1])
+        xtimes[i].append((end - start)/24/3600)
+        ax.plot(xtimes[i], accs[i], '+-', alpha=0.5, label=accounts[i])
+    ax.plot([0, (end - start)/24/3600], [0, 0], '--r', alpha=0.3)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.08), ncol=len(accounts) + 1)
+    ax.set_xlabel('Time in days since the starting analysis date')
+    ax.set_ylabel('Balance')
+    ax.set_title('Time trends for the account balances')
+
+
+def foo_weird(df_main, end, start, dates):
+    pass
+
+def graphical_analyze(event=None, but=None):
+    mainfig.clear()
+    titles = ['Categories', 'Payees', 'Accounts', 'Balance over time', 'Expenditure and Income over time']
+    mainfig.suptitle(titles[but])
+    df['Amount'] = df['Amount'].astype(float)
+    dates = np.array([time.mktime(time.strptime(x, '%d/%m/%y')) for x in df['Date'].to_numpy()])
+    try:  # validate date format
+        start = time.mktime(time.strptime(date_start_2.get(), '%d/%m/%y'))
+        end = time.mktime(time.strptime(date_end_2.get(), '%d/%m/%y'))
+    except:
+        val = status_graph_v.get()
+        status_graph.config(text='Incorrect!', status=DISABLED)
+        root.after(2000, lambda: status_graph.config(text=status_graph_v.set(val), status=NORMAL))
+        return
+    df_early = df.loc[dates < start, :]
+    df_main = df.loc[np.logical_and(dates >= start, dates <= end), :].copy(deep=True)
+    dates = np.array([time.mktime(time.strptime(x, '%d/%m/%y')) for x in df_main['Date'].to_numpy()])
+    if but in [0, 1, 2]:
+        foo_plot(['Category', 'Payee', 'Account'][but], df_main, end, start, dates)
+    elif but == 3:
+        foo_time(df_early, df_main, end, start, dates)
+    elif but == 4:
+        foo_weird(df_main, end, start, dates)
+    mainfig.canvas.draw()
+
+
+def focus_change(event=None):
+    val = status_graph_v.get()
+    txts = np.array(['Focus on Minus', 'Focus on Plus'])
+    status_graph_v.set(txts[txts != val][0])
+    status_graph.config(text=status_graph_v.get())
+
+
 # GUI
 root = Tk()
 valid_entry = StringVar()
@@ -627,9 +771,36 @@ payee_numeric.grid(row=6, column=0, columnspan=4)
 category_numeric.grid(row=6, column=4, columnspan=4)
 numeric_analyze()
 
+f5 = Frame(nb)
+date_start_2 = Entry(f5, width=13, font=('Helvetica', 15), bg='#d0f5c9')
+date_start_2.insert(0, time.strftime('%d/%m/%y', time.localtime(float(metadata[0]))))
+date_end_2 = Entry(f5, width=13, font=('Helvetica', 15), bg='#d0f5c9')
+date_end_2.insert(0, time.strftime('%d/%m/%y', time.localtime()))
+date_start_2_l = Label(f5, text='Analysis from ', font=('Helvetica', 15))
+date_end_2_l = Label(f5, text='to', font=('Helvetica', 15))
+date_start_2_l.grid(column=0, row=0)
+date_start_2.grid(column=1, row=0)
+date_end_2_l.grid(column=2, row=0)
+date_end_2.grid(column=3, row=0)
+status_graph_v = StringVar()
+status_graph_v.set('Focus on Minus')
+status_graph = ttk.Button(f5, text='Focus on Minus')
+status_graph.grid(row=0, column=4)
+status_graph.bind('<Button-1>', focus_change)
+mainfig = Figure(figsize=(12, 7), dpi=100)
+maincanvas = FigureCanvasTkAgg(mainfig, f5)
+maincanvas.get_tk_widget().grid(row=2, column=0, columnspan=5)
+load_buttons = []
+for i in range(5):
+    load_buttons.append(ttk.Button(f5, text='Graph ' + str(i + 1)))
+    load_buttons[-1].bind('<Button-1>', lambda x, y=i: graphical_analyze(x, y))
+    load_buttons[-1].grid(row=1, column=i)
+graphical_analyze(but=0)
+
 nb.add(f1, text='Entry form')
 nb.add(f2, text='View')
 nb.add(f4, text='Numeric')
+nb.add(f5, text='Graphical')
 
 nb.pack()
 root.mainloop()

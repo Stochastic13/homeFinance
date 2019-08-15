@@ -29,7 +29,7 @@ All the assets and money accounts are modelled under *Accounts*. One would ideal
 *Categories* are just a way to classify transactions. Each transaction can be labelled with a category irrespective of all other fields. For example, a *transfer* modelling the payment of Credit Card Bills can be labelled with a category "bills". A *Minus* transaction from Paypal to Amazon to buy a phone can be labelled with the category "electronics", and so on.
 
 There is no standard way to model your finances. This is just a rough guide. Feel free to create whatever system suits you the best.
-![The model used in the app](demo.png)
+![The model used in the app](demo_png/demo.png)
 
 ### Description of the app
 To run this app, navigate to the folder containing the script files and enter in the console `python homeFinance.py <dbname>` with a `<dbname>` if you want to open an already existing databse or without that to create a new database. It will ask for the password and if successful, will open the GUI in the former case, or will prompt for the name of the new database in the latter case. Either way, you need to be replying in console.
@@ -37,29 +37,34 @@ To run this app, navigate to the folder containing the script files and enter in
 ![new and old database](demo_png/demo1.png)
 ![new and old database2](demo_png/demo2.png)
 
-There are currently 3 tabs in the GUI. The first one is to add new accounts (currently start with zero opening balance. You might need a pseudo past-dated transaction to add balance), payees, categories or add a new transaction. The options are self explanatory and the submit buitton provides feedback if the transaction was successfully added or if the entered data failed to validate (date or the amount). You can also delete accounts/payees/categories but that will not remove the transactions and the only way to view them in the viewer is to select all the columns in all the lists. 
+There are currently 4 tabs in the GUI. The first one is to add new accounts (currently start with zero opening balance. You might need a pseudo past-dated transaction to add balance), payees, categories or add a new transaction. The options are self explanatory and the submit buitton provides feedback if the transaction was successfully added or if the entered data failed to validate (date or the amount). You can also delete accounts/payees/categories but that will not remove the transactions and the only way to view them in the viewer is to select all the columns in all the lists. 
 
 ![entry form](demo_png/demo3.png)
 
-Nest is the viewer. It allows filtering based on what all is selected. Press refresh to load. Select everything to display all transactions. Only the transactions within the date range will be shown.
+Next is the viewer. It allows filtering based on what all is selected. Press refresh to load. Select everything to display all transactions. Only the transactions within the date range will be shown.
 
 ![viewer](demo_png/demo4.png)
 
-Last is the Numeric Analysis tab. Displays almost evrything you might want to know as a summary of transactions within a date range. Opening balance refers to the sum total of the transactions happening before the starting date of the analysis range.
+Second Last is the Numeric Analysis tab. Displays almost evrything you might want to know as a summary of transactions within a date range. Opening balance refers to the sum total of the transactions happening before the starting date of the analysis range.
 
 ![numeric analysis](demo_png/demo5.png)
 
-On quitting the option of saving shall come up in the console. Please do not skip this. Press 'y' and enter to save. Will require your password (I do not know why this feature is there. Seemed cool when I added it. ).
+Last is the Graphical Analysis tab. The drill is the same. Keep a date-range specified. Press the button of the graph to display different graphs. There is a button on the right of the range, which decides the *focus on Plus* or *focus on Minus*, which is important for subplot 3 in graph number 1,2,3. It toggles on being pressed, and to refresh, press the desired graph button again. In graphs 1,2,3 there are two pie charts showing the distribution of money inflow and outflow according to categories, payees and accounts. The third subplot in all of these shows a weekly breakdown of the percentage of that week's Minus (or Plus, depending upon the button state) transactions belonging to different categories/payees/accounts. It is a 100% stacked area plot, as it is sometimes called. Allows you to see how the contribution of different categories/payees/accounts change over time. (*Might convert this in future into simply stacked area plot showing absolute values and not percentages, orperhaps give an option for this*)
+
+![graphical analysis](demo_png/demo6.png)
+
+On quitting the option of saving shall come up in the console. Please do not skip this. Press 'y' and enter to save. Will require your password (I do not know why this feature is there. Seemed cool when I added it.).
 
 
 ### Upcoming Features
 #### Definitely Upcoming
 0. (0-indexed, as it should be) Code cleanup for readability
-1. Graphical Analysis tab
+1. ~Graphical Analysis tab~ (yes, I actually did it)
 2. Export databse as csv
 3. Change Password
 4. Save button in the UI and auto-save
 5. Support for adding opening balance when adding a new Account
+6. **Better Documentation**
 #### Maybe upcoming
 0. Import database data
 1. Delete transactions
@@ -71,4 +76,5 @@ On quitting the option of saving shall come up in the console. Please do not ski
 1. [Cryptography](https://pypi.org/project/cryptography/) (Cool Stuff, I know)
 2. [Pandas](https://pypi.org/project/pandas/)
 3. [Numpy](https://pypi.org/project/numpy/)
-4. base64, os, sys, tkinter, time, getpass (Usually included as the standard python library)
+4. [Matplotlib](https://pypi.org/project/matplotlib/)
+5. base64, os, sys, tkinter, time, getpass (Usually included as the standard python library)
