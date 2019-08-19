@@ -493,7 +493,7 @@ def foo_time(df_early, df_main, end, start, dates):
 
 
 def foo_weird(df_main, end, start, dates):
-    pass
+    mainfig.suptitle('Under Construction. In next update.')
 
 def graphical_analyze(event=None, but=None):
     mainfig.clear()
@@ -787,7 +787,7 @@ status_graph_v.set('Focus on Minus')
 status_graph = ttk.Button(f5, text='Focus on Minus')
 status_graph.grid(row=0, column=4)
 status_graph.bind('<Button-1>', focus_change)
-mainfig = Figure(figsize=(12, 7), dpi=100)
+mainfig = Figure(figsize=(12, 6), dpi=100)
 maincanvas = FigureCanvasTkAgg(mainfig, f5)
 maincanvas.get_tk_widget().grid(row=2, column=0, columnspan=5)
 load_buttons = []
