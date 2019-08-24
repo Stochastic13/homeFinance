@@ -49,16 +49,11 @@ def decrypt_db(dbpath):
 
 
 def encrypt_db(dbpath, password, sdate, df, t_count, categories, accounts, payees):
-    while True:
-        pf = getpass.getpass(prompt='Enter Password: ').encode()
-        if pf == password:
-            break
-        print('Incorrect Password.')
     salt = os.urandom(16)  # a new salt every time the database is saved
     metadata = sdate + ',' + str(t_count) + ',' + ':'.join(
         [';'.join(categories), ';'.join(accounts), ';'.join(payees)]) + ',' + str(time.time()) + '\n'
     kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
-    key = base64.urlsafe_b64encode(kdf.derive(pf))
+    key = base64.urlsafe_b64encode(kdf.derive(password))
     f_obj = Fernet(key)
     df_string = ''
     for i, j in df.iterrows():

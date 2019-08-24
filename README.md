@@ -45,25 +45,25 @@ Next is the viewer. It allows filtering based on what all is selected. Press ref
 
 ![viewer](demo_png/demo4.png)
 
-Second Last is the Numeric Analysis tab. Displays almost evrything you might want to know as a summary of transactions within a date range. Opening balance refers to the sum total of the transactions happening before the starting date of the analysis range.
+Second Last is the Numeric Analysis tab. Displays almost evrything you might want to know as a summary of transactions within a date range. Opening balance refers to the sum total of the transactions happening before the starting date of the analysis range as of now, and hence, currently, you can actually 'open' an account by adding a backdated Plus entry and always starting analysis after the date of this entry.
 
 ![numeric analysis](demo_png/demo5.png)
 
-Last is the Graphical Analysis tab. The drill is the same. Keep a date-range specified. Press the button of the graph to display different graphs. There is a button on the right of the range, which decides the *focus on Plus* or *focus on Minus*, which is important for subplot 3 in graph number 1,2,3. It toggles on being pressed, and to refresh, press the desired graph button again. In graphs 1,2,3 there are two pie charts showing the distribution of money inflow and outflow according to categories, payees and accounts. The third subplot in all of these shows a weekly breakdown of the percentage of that week's Minus (or Plus, depending upon the button state) transactions belonging to different categories/payees/accounts. It is a 100% stacked area plot, as it is sometimes called. Allows you to see how the contribution of different categories/payees/accounts change over time. (*Might convert this in future into simply stacked area plot showing absolute values and not percentages, orperhaps give an option for this*)
+Last is the Graphical Analysis tab. The drill is the same. Keep a date-range specified. Press the button of the graph-numbers to display different graphs. There is a button on the right of the range, which decides the *focus on Plus/Stacked* or *focus on Minus/Stacked* or *.../Unstacked*, which is important for subplot 3 in graph number 1,2,3. It toggles on being pressed, and to refresh, press the desired graph button again. In graphs 1,2,3 there are two pie charts showing the distribution of money inflow and outflow according to categories, payees and accounts. The third subplot in all of these shows a weekly breakdown of that week's Minus (or Plus, depending upon the button state) transactions belonging to different categories/payees/accounts. It is a 100% stacked area plot (as it is sometimes called) or a simple stacked area plot depending on the toggle-button. Allows you to see how the contribution of different categories/payees/accounts change over time.
 
 ![graphical analysis](demo_png/demo6.png)
 
-On quitting the option of saving shall come up in the console. Please do not skip this. Press 'y' and enter to save. Will require your password (I do not know why this feature is there. Seemed cool when I added it.).
+On quitting the option of saving shall come up in the console. Please do not skip this. Press 'y' and enter to save. ~Will require your password (I do not know why this feature is there. Seemed cool when I added it.).~
 
 
 ### Upcoming Features
 #### Definitely Upcoming
 0. (0-indexed, as it should be) Code cleanup for readability
 1. ~Graphical Analysis tab~ (yes, I actually did it)
-2. Export databse as csv
+2. Export database as csv
 3. Change Password
 4. Save button in the UI and auto-save
-5. Support for adding opening balance when adding a new Account
+5. Support for adding opening balance when adding a new Account (**As of now, add a backdated Plus entry and always start analysis after the date of this entry**)
 6. **Better Documentation**
 #### Maybe upcoming
 0. Import database data
