@@ -41,9 +41,10 @@ There are currently 4 tabs in the GUI. The first one is to add new accounts (cur
 
 ![entry form](demo_png/demo3.png)
 
-Next is the viewer. It allows filtering based on what all is selected. Press refresh to load. Select everything to display all transactions. Only the transactions within the date range will be shown.
+Next is the viewer. It allows filtering based on what all is selected. Press refresh to load. Select everything to display all transactions, even for the categories/payees now deleted and now not displayed inthe filter lists. Only the transactions within the date range will be shown. Additionally, there is an option now to delete transactions based on their SerialIDs. Be carefult since this is irreversible, and is currently experimental.
 
 ![viewer](demo_png/demo4.png)
+![viewer2](demo_png/demo7.png)
 
 Second Last is the Numeric Analysis tab. Displays almost evrything you might want to know as a summary of transactions within a date range. Opening balance refers to the sum total of the transactions happening before the starting date of the analysis range as of now, and hence, currently, you can actually 'open' an account by adding a backdated Plus entry and always starting analysis after the date of this entry.
 
@@ -67,7 +68,7 @@ On quitting the option of saving shall come up in the console. Please do not ski
 6. **Better Documentation**
 #### Maybe upcoming
 0. Import database data
-1. Delete transactions
+1. ~Delete transactions~
 2. Budget setup and compare
 3. Different currencies
 4. UI-based password entry

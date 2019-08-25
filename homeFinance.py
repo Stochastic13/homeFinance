@@ -14,24 +14,26 @@ from matplotlib.gridspec import GridSpec
 new = True
 mainfile = None
 p = None
-dbpath = None  # These four lines are to remove pycharm flagging upcoming lines as a warning
+dbpath = None  # These four lines are to remove Pycharm flagging upcoming lines as a warning
 if len(sys.argv) < 2:
     new = True
 elif len(sys.argv) == 2:
     dbpath = os.getcwd() + '\\' + sys.argv[1]
     new = False  # Using old one
 else:
-    print('Too many arguments given.')
+    print('Too many arguments given. Press Enter to quit.')
+    input() # so that the cmd does not close before allowing to read the error
     quit(1)
 
 if new:
     new_db()
-    print('Restart to begin')
+    print('Restart to begin. Press Enter to continue.')
+    input()
     quit(0)
 else:
     mainfile, p = decrypt_db(dbpath)
 
-# parsing the data into a pandas dataframe
+# parsing the data into a pandas DataFrame
 metadata = mainfile.decode().split('\n')[0].split(',')
 # printing basic stats
 print('Database created at: ' + time.asctime(time.localtime(float(metadata[0]))))
@@ -39,7 +41,7 @@ print('Database last opened at: ' + time.asctime(time.localtime(float(metadata[3
 print('Total Transactions: ' + metadata[1])
 df = mainfile.decode().split('\n')[1:]
 df = [x.split(',') for x in df]
-if len(df) == 1:
+if len(df) == 1:  # new database? Forgot the motivation. To avoid empty row?
     df = []
 df = pd.DataFrame.from_records(data=df,
                                columns=['SerialID', 'Date', 'Type', 'From', 'To', 'Category', 'Amount', 'Comments'])
@@ -235,7 +237,13 @@ def view_refresh(event=None):  # refresh the view in the View tab (after a new f
     string_final = '{:^5s}{:^10s}{:^20s}{:^20s}{:^20s}{:^20s}{:^15s}{:^40s}'.format(
         *['ID', 'Date', 'Type', 'From', 'To', 'Category', 'Amount', 'Comments'])
     string_final += '\n' + ('_' * 150) + '\n'
-    for x, y in df.loc[main_bool, :].iterrows():
+    dftemp = df.copy()
+    dftemp.loc[:, 'Date'] = np.array(
+        [time.mktime(time.strptime(x, '%d/%m/%y')) for x in dftemp.loc[:, 'Date'].to_numpy()])
+    dftemp.sort_values('Date', inplace=True)
+    dftemp.loc[:, 'Date'] = np.array(
+        [time.strftime('%d/%m/%y', time.localtime(x)) for x in dftemp.loc[:, 'Date'].to_numpy()])
+    for x, y in dftemp.loc[main_bool, :].iterrows():
         string_final = string_final + '{:^5s}{:^10s}{:^20s}{:^20s}{:^20s}{:^20s}{:^15s}{:40s}'.format(
             *[str(z) for z in y.to_list()]) + '\n'
     viewmain.delete(1.0, END)
@@ -565,6 +573,41 @@ def focus_change(event=None):
     status_graph.config(text=status_graph_v.get())
 
 
+def confirm_trans_del(event=None, reset=False):
+    global df
+    global t_count
+    txts = ['<-----Delete Transactions by Serial ID', '<---Confirm Delete? Cannot be reversed.']
+    if reset:
+        del_trans_e.delete(0, END)
+        del_trans_l_var.set(txts[0])
+        del_trans_b.config(text='Delete')
+        return
+    if del_trans_l_var.get() == txts[0]:
+        try:
+            val = int(del_trans_e.get())
+            assert val in df.loc[:, 'SerialID'].to_numpy(dtype=int)
+            del_trans_l_var.set(txts[1])
+            del_trans_b.config(text='Confirm?')
+            root.after(4000, lambda: confirm_trans_del(None, True))
+        except (AssertionError, ValueError):
+            del_trans_l_var.set('<---Invalid Serial ID. Check Again.')
+            root.after(2000, lambda: confirm_trans_del(reset=True))
+    elif del_trans_l_var.get() == txts[1]:
+        try:
+            val = int(del_trans_e.get())
+            assert val in df.loc[:, 'SerialID'].to_numpy(dtype=int)
+            df = df.drop(df.loc[df.SerialID == str(val), :].index)
+            t_count -= 1
+            df.loc[:, 'SerialID'] = np.array(np.arange(0, t_count, dtype=int), dtype=str)
+            del_trans_l_var.set('Successfully Deleted Serial ID ' + str(val))
+            root.after(2000, lambda: confirm_trans_del(reset=True))
+        except (AssertionError, ValueError):
+            del_trans_l_var.set('<---Invalid Serial ID. Check Again.')
+            root.after(2000, lambda: confirm_trans_del(reset=True))
+    else:
+        pass
+
+
 # GUI
 root = Tk()
 valid_entry = StringVar()
@@ -744,6 +787,15 @@ refresh.bind('<Button-1>', view_refresh)
 refresh.grid(column=5, row=0)
 viewmain = scrolledtext.ScrolledText(f2, font=('Lucida Console', 10), height=30, width=150, wrap=NONE)
 viewmain.grid(column=0, row=1, columnspan=6)
+del_trans_l_var = StringVar()
+del_trans_l_var.set('<-----Delete Transactions by Serial ID')
+del_trans_l = Label(f2, textvariable=del_trans_l_var, font=('Lucida Console', 15))
+del_trans_b = ttk.Button(f2, text='Delete')
+del_trans_e = Entry(f2, font=('Helvetica', 15), width=8)
+del_trans_b.bind('<Button-1>', confirm_trans_del)
+del_trans_l.grid(row=2, column=3, columnspan=3)
+del_trans_e.grid(row=2, column=2, columnspan=2)
+del_trans_b.grid(row=2, column=0, columnspan=2)
 
 f4 = Frame(nb)
 date_start = Entry(f4, width=13, font=('Helvetica', 15), bg='#d0f5c9')
