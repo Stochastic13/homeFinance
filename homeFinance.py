@@ -22,7 +22,7 @@ elif len(sys.argv) == 2:
     new = False  # Using old one
 else:
     print('Too many arguments given. Press Enter to quit.')
-    input() # so that the cmd does not close before allowing to read the error
+    input()  # so that the cmd does not close before allowing to read the error
     quit(1)
 
 if new:
@@ -328,7 +328,7 @@ def numeric_analyze(event=None):  # analyze and summarize the data numericaly
             payeesp.append(
                 np.sum(df_spec2.loc[np.logical_and(df_spec2['To'] == j, df_spec2['Type'] == 'Plus'), 'Amount']))
             payeesm.append(np.sum(df_spec2.loc[np.logical_and(df_spec2['To'] == j,
-                                                              df_spec2['Type'].isin(['Minus', 'Transfer'])), 'Amount']))
+                                                              df_spec2['Type'] == 'Minus'), 'Amount']))
         payeestm += np.array(payeesm)
         payeestp += np.array(payeesp)
         labs[5] += payees[np.argmax(payeesm)] + '\n'
@@ -390,7 +390,7 @@ def numeric_analyze(event=None):  # analyze and summarize the data numericaly
         val = -np.sum(df_sub.loc[np.logical_and(df_sub['Type'] == 'Minus', df_sub['Category'] == i), 'Amount'])
         val += np.sum(df_sub.loc[np.logical_and(df_sub['Type'] == 'Plus', df_sub['Category'] == i), 'Amount'])
         category_numeric.insert(END, str(val) + '\n', i)
-        category_numeric.tag_config(i, foreground=['#02630c', '#870309'][(val) < 0])
+        category_numeric.tag_config(i, foreground=['#02630c', '#870309'][val < 0])
         x += 1
     category_numeric.config(state=DISABLED)
 
@@ -606,6 +606,59 @@ def confirm_trans_del(event=None, reset=False):
             root.after(2000, lambda: confirm_trans_del(reset=True))
     else:
         pass
+
+
+def export_db_func(event=None):
+    path1 = export_e_1.get()
+    path2 = export_e_2.get()
+    if os.path.isfile(path1):
+        export_l_1.config(text='File already exists. Afraid to overwrite', fg='#870309')
+        root.after(3000, lambda: export_l_1.config(text='Files 1: (transaction -> csv)', fg='#000000'))
+    else:
+        try:
+            with open(path1, 'w', newline='') as f:
+                f.write(df.to_csv(index=False))
+            export_l_1.config(text='Successfully done!', fg='#02630c')
+            root.after(3000, lambda: export_l_1.config(text='Files 1: (transaction -> csv)', fg='#000000'))
+        except OSError:
+            export_l_1.config(text='Invalid Path OR Permission not available for the directory', fg='#870309')
+            root.after(3000, lambda: export_l_1.config(text='Files 1: (transaction -> csv)', fg='#000000'))
+    if os.path.isfile(path2):
+        export_l_2.config(text='File already exists. Afraid to overwrite', fg='#870309')
+        root.after(3000, lambda: export_l_2.config(text='Path 2: (accounts/payees/categories -> txt)', fg='#000000'))
+    else:
+        try:
+            with open(path2, 'w') as f:
+                s = '\n'.join([','.join(payees), ','.join(categories), ','.join(accounts)])
+                f.write(s)
+            export_l_2.config(text='Successfully done!', fg='#02630c')
+            root.after(3000,
+                       lambda: export_l_2.config(text='Path 2: (accounts/payees/categories -> txt)', fg='#000000'))
+        except OSError:
+            export_l_2.config(text='Invalid Path OR Permission not available for the directory', fg='#870309')
+            root.after(3000,
+                       lambda: export_l_2.config(text='Path 2: (accounts/payees/categories -> txt)', fg='#000000'))
+
+
+def import_db_func(event=None):
+    pass
+
+
+def password_change(event=None):
+    global p
+    if old_p_e.get().encode() != p:
+        main_p_l.config(text='Incorrect Old Password', fg='#870309')
+        root.after(2500, lambda: main_p_l.config(fg='#000000', text='Change Password'))
+    elif new_p_e.get() != cnf_p_e.get():
+        main_p_l.config(text='New Passwords Do Not Match', fg='#870309')
+        root.after(2500, lambda: main_p_l.config(fg='#000000', text='Change Password'))
+    else:
+        p = new_p_e.get().encode()
+        old_p_e.delete(0, END)
+        new_p_e.delete(0, END)
+        cnf_p_e.delete(0, END)
+        main_p_l.config(text='Successfully changed!', fg='#02630c')
+        root.after(2500, lambda: main_p_l.config(fg='#000000', text='Change Password'))
 
 
 # GUI
@@ -886,10 +939,81 @@ for i in range(5):
     load_buttons[-1].grid(row=1, column=i)
 graphical_analyze(but=0)
 
+f6 = Frame(nb)
+# add non-default name options, add better checking of the path, case sensitivity in imported names, remove repeats?
+# confirm and then give ovewrite support
+export_l_1 = Label(f6, text='Path 1: (transaction -> csv)', font=('Helvetica', 12), padx=30, pady=15)
+export_l_2 = Label(f6, text='Path 2: (accounts/payees/categories -> txt)', font=('Helvetica', 12), padx=30, pady=15)
+export_e_1 = Entry(f6, font=('Helvetica', 12), width=75)
+export_e_1.insert(0, os.getcwd() + '\\db_hf_main.csv')
+export_e_2 = Entry(f6, font=('Helvetica', 12), width=75)
+export_e_2.insert(0, os.getcwd() + '\\db_hf_aux.txt')
+export_b_main = ttk.Button(f6, text='!!Export!!')
+
+import_l_1 = Label(f6, text='Files 1: (transaction -> csv)', font=('Helvetica', 12), padx=30, pady=15)
+import_l_2 = Label(f6, text='Files 2: (accounts/payees/categories -> txt)', font=('Helvetica', 12), padx=30, pady=15)
+import_b_1 = ttk.Button(f6, text='Add 1')
+import_b_2 = ttk.Button(f6, text='Add 2')
+import_e_1 = Entry(f6, font=('Helvetica', 12), width=75)
+import_e_1.insert(0, os.getcwd() + '\\db_hf_main.csv')
+import_e_2 = Entry(f6, font=('Helvetica', 12), width=75)
+import_e_2.insert(0, os.getcwd() + '\\db_hf_aux.txt')
+import_l_main1 = Label(f6, text='Transactions added: 0', font=('Lucida Console', 12), padx=20)
+import_l_main2 = Label(f6, text='Accounts-Payees-Categories added: 0-0-0', font=('Lucida Console', 12), padx=30,
+                       pady=15)
+import_e_main = Entry(f6, font=('Helvetica', 12), width=75)
+val = dbpath.split('\\')
+val = val[0:len(val) - 1]
+val = '\\'.join(val)
+import_e_main.insert(0, val + '\\db_hf_imported')
+import_b_main = ttk.Button(f6, text='!!Import!!')
+
+Label(f6, text='Export', font=('Helvetica', 24), pady=40).grid(column=0, row=0, columnspan=5)
+export_l_1.grid(column=0, row=1, columnspan=2, sticky='w')
+export_e_1.grid(column=2, row=1, columnspan=2, sticky='e')
+export_l_2.grid(column=0, row=2, columnspan=2, sticky='w')
+export_e_2.grid(column=2, row=2, columnspan=2, sticky='e')
+export_b_main.grid(column=0, row=3, columnspan=4)
+Label(f6, text='Import (Upcoming. Does not work currently)', font=('Helvetica', 24), pady=40).grid(column=0, row=4,
+                                                                                                   columnspan=5)
+import_l_1.grid(column=0, row=5, columnspan=2, sticky='w')
+import_e_1.grid(column=2, row=5, columnspan=2)
+import_b_1.grid(column=4, row=5)
+import_l_2.grid(column=0, row=6, columnspan=2, sticky='w')
+import_e_2.grid(column=2, row=6, columnspan=2)
+import_b_2.grid(column=4, row=6)
+import_l_main1.grid(column=0, row=7, columnspan=2)
+import_l_main2.grid(column=2, row=7, columnspan=2)
+import_e_main.grid(column=0, row=8, columnspan=3)
+import_b_main.grid(column=3, row=8, sticky='e')
+export_b_main.bind('<Button-1>', export_db_func)
+import_b_main.bind('<Button-1>', import_db_func)
+
+f7 = Frame(nb)
+main_p_l = Label(f7, text='Change Password', font=('Helvetica', 30))
+old_p_l = Label(f7, text='Enter Current Password: ', font=('Lucida Console', 15), padx=40)
+old_p_e = Entry(f7, width=30, show='*', font=('Lucida Console', 15))
+new_p_l = Label(f7, text='Enter New Password: ', font=('Lucida Console', 15), padx=40)
+new_p_e = Entry(f7, width=30, show='*', font=('Lucida Console', 15))
+cnf_p_l = Label(f7, text='Confirm New Password: ', font=('Lucida Console', 15), padx=40)
+cnf_p_e = Entry(f7, width=30, show='*', font=('Lucida Console', 15))
+main_p_b = ttk.Button(f7, text='Change')
+main_p_l.grid(row=0, column=0, columnspan=2)
+old_p_l.grid(row=1, column=0)
+old_p_e.grid(row=1, column=1)
+new_p_l.grid(row=2, column=0)
+new_p_e.grid(row=2, column=1)
+cnf_p_l.grid(row=3, column=0)
+cnf_p_e.grid(row=3, column=1)
+main_p_b.grid(row=4, column=0, columnspan=2)
+main_p_b.bind('<Button-1>', password_change)
+
 nb.add(f1, text='Entry form')
 nb.add(f2, text='View')
 nb.add(f4, text='Numeric')
 nb.add(f5, text='Graphical')
+nb.add(f6, text='Export/Import')
+nb.add(f7, text='Change Password')
 
 nb.pack()
 root.mainloop()
