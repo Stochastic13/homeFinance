@@ -371,8 +371,12 @@ def numeric_analyze(event=None):  # analyze and summarize the data numericaly
         payee_numeric.insert(END, ' ' * 10)
         payee_numeric.insert(END, '{:^20s}'.format(i))
         payee_numeric.insert(END, ' ' * 5)
-        payee_numeric.insert(END, str(payeestp[x] - payeestm[x]) + '\n', i)
-        payee_numeric.tag_config(i, foreground=['#02630c', '#870309'][(payeestp[x] - payeestm[x]) < 0])
+        if ' ' in i:  # Tkinter Text tags cannot have white spaces
+            tg = i.replace(' ', ';')
+        else:
+            tg = i
+        payee_numeric.insert(END, str(payeestp[x] - payeestm[x]) + '\n', tg)
+        payee_numeric.tag_config(tg, foreground=['#02630c', '#870309'][(payeestp[x] - payeestm[x]) < 0])
         x += 1
     payee_numeric.config(state=DISABLED)
     category_numeric.config(state=NORMAL)
@@ -389,8 +393,12 @@ def numeric_analyze(event=None):  # analyze and summarize the data numericaly
         category_numeric.insert(END, ' ' * 5)
         val = -np.sum(df_sub.loc[np.logical_and(df_sub['Type'] == 'Minus', df_sub['Category'] == i), 'Amount'])
         val += np.sum(df_sub.loc[np.logical_and(df_sub['Type'] == 'Plus', df_sub['Category'] == i), 'Amount'])
-        category_numeric.insert(END, str(val) + '\n', i)
-        category_numeric.tag_config(i, foreground=['#02630c', '#870309'][val < 0])
+        if ' ' in i:  # Tkinter Text tags cannot have white spaces
+            tg = i.replace(' ', ';')
+        else:
+            tg = i
+        category_numeric.insert(END, str(val) + '\n', tg)
+        category_numeric.tag_config(tg, foreground=['#02630c', '#870309'][val < 0])
         x += 1
     category_numeric.config(state=DISABLED)
 
