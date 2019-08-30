@@ -5,6 +5,7 @@ This is the homepage of a homegrown finance app for home finances, meant for all
 ### Why should I use this app?
 I am very glad you asked. Really. Well, there are tons of reasons. Here are some of the good ones:
 
+0. **Well...it is useful, actually.** This app is actually useful. Really. So many functions too.
 1. **Feel like a techie, sudo style!** This app is very clunky and unnatural. It has the console open in the background and requires you to click the buttons rather than tab-enter, very cryptic usage pattern, weird old looking UI, along with forcing some options to be answered on the console. Only the coolest programmers use such apps. :)
 2. **Support Education**. If you star this, or download this, contribute to this, or simply use this, at least one person shall be inspired to learn more about the stuff involved in the programming of this app, and in general educate himself (me). That is a very noble task, meant only for truly noble men/women like you. 
 3. **Be a part of bleeding edge software**. Tons of bugs, seriously required UI improvements, unlimited scope for improvement, cool but pointless integrations like cryptography support and an active developer - all the hallmarks of a bleeding edge software.
@@ -15,6 +16,7 @@ I am very glad you asked. Really. Well, there are tons of reasons. Here are some
 8. **Play hide and seek in the code** Decide on what you want to find in there (say the label corresponding to the date in the viewer). Now set out to go through the 500+ lines to find this particular button without proper comments. A sure treat for adrenaline junkies.
 
 ### Bad reasons to use this app
+0. **World-class data analytics** Not for world-class analytics. (Only Universe-class. :) )
 1. **To rely solely on this app for home financial management** Kind of obvious. Why would anyone rely on a home-finance app to do their home finances anyway?
 2. **Tax returns** No. Please not the t-word.
 3. **Extremely secret alien finances** Although the cryptography is definitely unbreakable (duh), I actually don't have much idea what I'm doing. So I would rather let the aliens do their work themselves or use an alternative app.
@@ -37,43 +39,54 @@ To run this app, navigate to the folder containing the script files and enter in
 ![new and old database](demo_png/demo1.png)
 ![new and old database2](demo_png/demo2.png)
 
-There are currently 4 tabs in the GUI. The first one is to add new accounts (currently start with zero opening balance. You might need a pseudo past-dated transaction to add balance), payees, categories or add a new transaction. The options are self explanatory and the submit buitton provides feedback if the transaction was successfully added or if the entered data failed to validate (date or the amount). You can also delete accounts/payees/categories but that will not remove the transactions and the only way to view them in the viewer is to select all the columns in all the lists. 
+There are currently 7 tabs in the GUI. The first one is to add new accounts (currently start with zero opening balance. You might need a pseudo past-dated transaction to add balance, past-dated enough to never interfere with the analysis date-ranges), payees, categories or add a new transaction. The options are self explanatory and the submit buitton provides feedback if the transaction was successfully added or if the entered data failed to validate (date or the amount). You can also delete accounts/payees/categories but that will not remove the transactions and the only way to view them in the viewer is to select all the columns in all the lists. 
 
 ![entry form](demo_png/demo3.png)
 
-Next is the viewer. It allows filtering based on what all is selected. Press refresh to load. Select everything to display all transactions, even for the categories/payees now deleted and now not displayed inthe filter lists. Only the transactions within the date range will be shown. Additionally, there is an option now to delete transactions based on their SerialIDs. Be carefult since this is irreversible, and is currently experimental.
+Next is the viewer. It allows filtering based on what all is selected. Press refresh to load. Select everything to display all transactions, even for the categories/payees now deleted and now not displayed inthe filter lists. Only the transactions within the date range will be shown. Additionally, there is an option now to delete transactions based on their SerialIDs. Be carefult since this is irreversible, ~and is currently experimental~.
 
 ![viewer](demo_png/demo4.png)
 ![viewer2](demo_png/demo7.png)
 
-Second Last is the Numeric Analysis tab. Displays almost evrything you might want to know as a summary of transactions within a date range. Opening balance refers to the sum total of the transactions happening before the starting date of the analysis range as of now, and hence, currently, you can actually 'open' an account by adding a backdated Plus entry and always starting analysis after the date of this entry.
+Next is the Numeric Analysis tab. Displays almost evrything you might want to know as a summary of transactions within a date range. Opening balance refers to the sum total of the transactions happening before the starting date of the analysis range as of now, and hence, currently, you can actually 'open' an account by adding a backdated *Plus* entry and always starting analysis after the date of this entry. Colors indicate whether the amount is negative or above zero.
 
 ![numeric analysis](demo_png/demo5.png)
 
-Last is the Graphical Analysis tab. The drill is the same. Keep a date-range specified. Press the button of the graph-numbers to display different graphs. There is a button on the right of the range, which decides the *focus on Plus/Stacked* or *focus on Minus/Stacked* or *.../Unstacked*, which is important for subplot 3 in graph number 1,2,3. It toggles on being pressed, and to refresh, press the desired graph button again. In graphs 1,2,3 there are two pie charts showing the distribution of money inflow and outflow according to categories, payees and accounts. The third subplot in all of these shows a weekly breakdown of that week's Minus (or Plus, depending upon the button state) transactions belonging to different categories/payees/accounts. It is a 100% stacked area plot (as it is sometimes called) or a simple stacked area plot depending on the toggle-button. Allows you to see how the contribution of different categories/payees/accounts change over time.
+Next is the Graphical Analysis tab. The drill is the same. Keep a date-range specified. Press the button of the graph-numbers to display different graphs. There is a button on the right of the range, which decides the *focus on Plus/Stacked* or *focus on Minus/Stacked* or *.../Unstacked*, which is important for subplot 3 in graph number 1,2,3. It toggles on being pressed, and to refresh, press the desired graph button again. In graphs 1,2,3 there are two pie charts showing the distribution of money inflow and outflow according to categories, payees and accounts. The third subplot in all of these shows a weekly breakdown of that week's Minus (or Plus, depending upon the button state) transactions belonging to different categories/payees/accounts. It is a 100% stacked area plot (as it is sometimes called) or a simple stacked area plot depending on the toggle-button. Allows you to see how the contribution of different categories/payees/accounts change over time. Graph 4 shows the trend of the account balance over time, and the total balance (the home finance version of "Net worth"). Graph 5 has all weird stuff and analysis which is extremely useful and superb and so nice and all. :D
 
-![graphical analysis](demo_png/demo6.png)
+![graphical analysis](demo_png/demo8.png)
+
+Next is the Export/Import tab. It allows exporting the dataset as a csv and all the accounts/categories/payees as a text file. The default file names are already loaded in the respective entry boxes. On pressing the export button, the files will be created, or the relevant error message shown. For import, you can load from multiple files, files of two kind. One loads the accounts/categories/payees from a text file with comma separated values and newline-separated accounts/payees/categories, and another from a csv (importing the transactions). After loading each of these kinds of files (you can load only the csv too), you will have an updated count of how many transactions/accounts/payees/categories are imported. Repeatedly pressing the import files button will create duplicates. "Reset" to start afresh. Otherwise press the main import button to create the new database, encrypted by default with the password *abcde12345*.
+
+![export/import](demo_png/demo9.png)
+
+Next is the Changing password tab. Quite self-explanatory. You need to save the database on quitting for the new password to be used.
+
+![change password](demo_png/demo10.png)
+
+Final tab is the about-the-app tab. Again, self-explanatory.
+
 
 On quitting the option of saving shall come up in the console. Please do not skip this. Press 'y' and enter to save. ~Will require your password (I do not know why this feature is there. Seemed cool when I added it.).~
 
 
 ### Upcoming Features
 #### Definitely Upcoming
-0. (0-indexed, as it should be) Code cleanup for readability
+0. (0-indexed, as it should be) Code cleanup for readability ~and code comments~
 1. ~Graphical Analysis tab~ (yes, I actually did it)
-2. Export database as csv
-3. Change Password
+2. ~Export database as csv~
+3. ~Change Password~
 4. Save button in the UI and auto-save
 5. Support for adding opening balance when adding a new Account (**As of now, add a backdated Plus entry and always start analysis after the date of this entry**)
-6. **Better Documentation**
+6. **Better Documentation** ~and updated readme~
 #### Maybe upcoming
-0. Import database data
+0. ~Import database data~
 1. ~Delete transactions~
 2. Budget setup and compare
 3. Different currencies
 4. UI-based password entry
 
-### Requirements (apart from Python 3.x)
+### Requirements (apart from Python 3.x and Windows)
 1. [Cryptography](https://pypi.org/project/cryptography/) (Cool Stuff, I know)
 2. [Pandas](https://pypi.org/project/pandas/)
 3. [Numpy](https://pypi.org/project/numpy/)

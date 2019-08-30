@@ -8,6 +8,8 @@ import getpass
 import time
 
 
+# using the fernet implementation from the cryptography package to encrypt/decrypt
+# Basically, consists of AES-128 in CBC mode with a signing key for checking the decryption based on SHA-256 HMAC
 def new_db():
     while True:
         p = getpass.getpass(prompt='Set New Password: ').encode()
@@ -43,7 +45,7 @@ def decrypt_db(dbpath):
                 mainfile = f_obj.decrypt(mainfile_enc)
                 print('Success.')
                 break
-            except InvalidToken:
+            except InvalidToken:  # raised when the validation fails (see fernet spec)
                 print('Failed to decrypt. Re-enter password.')
     return mainfile, p
 
