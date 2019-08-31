@@ -485,11 +485,13 @@ def foo_time(df_early, df_main, end, start, dates):  # for graph 4
     total = [0]
     xtotal = [0]
     for i in range(len(accounts)):  # append opening balance
+        accval = accounts[i]
         accs[i].append(
-            np.sum(df_early.loc[np.logical_and(df_early['Type'] == 'Plus', df_early['From'] == i), 'Amount']) - np.sum(
+            np.sum(df_early.loc[
+                       np.logical_and(df_early['Type'] == 'Plus', df_early['From'] == accval), 'Amount']) - np.sum(
                 df_early.loc[np.logical_and(df_early['Type'].isin(['Transfer', 'Minus']),
-                                            df_early['From'] == i), 'Amount']) + np.sum(
-                df_early.loc[np.logical_and(df_early['Type'] == 'Transfer', df_early['To'] == i), 'Amount']))
+                                            df_early['From'] == accval), 'Amount']) + np.sum(
+                df_early.loc[np.logical_and(df_early['Type'] == 'Transfer', df_early['To'] == accval), 'Amount']))
         xtimes[i].append(0)  # starting date is set to zero
         total[0] += accs[i][-1]
     df_main.loc[:, 'Date'] = dates.astype(float)  # use seconds since epoch for better manipulation
@@ -584,7 +586,7 @@ def graphical_analyze(event=None, but=None):
         return
     df_early = df.loc[dates < start, :]  # the dataset before the start date for opening balance
     df_main = df.loc[np.logical_and(dates >= start, dates <= end), :].copy(deep=True)  # copying to allow manipulation
-    dates = np.array([time.mktime(time.strptime(x, '%d/%m/%y')) for x in df_main['Date'].to_numpy()]) # s since epoch
+    dates = np.array([time.mktime(time.strptime(x, '%d/%m/%y')) for x in df_main['Date'].to_numpy()])  # s since epoch
     if but in [0, 1, 2]:
         foo_plot(['Category', 'Payee', 'Account'][but], df_main, end, start, dates)
     elif but == 3:
@@ -1141,6 +1143,6 @@ nb.add(f8, text='About')
 nb.pack()
 root.mainloop()
 
-if input('Save (y/n): ').lower() == 'y':
+if input('Save (y/everything else): ').lower() == 'y':
     encrypt_db(dbpath, p, metadata[0], df, t_count, categories, accounts, payees)
     quit(0)
