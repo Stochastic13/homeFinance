@@ -424,17 +424,17 @@ def foo_plot(x, df_main, end, start, dates):  # for graphs 1, 2, 3; x = one of t
     vals_plot_m = np.array(val_minus)[np.array(val_minus) > 0]  # removing zero-transaction elements in values and names
     cats_plot_m = np.array(d2[x])[np.array(val_minus) > 0]
     if len(vals_plot_m) > 9:  # to prevent overcrowding of the legend
-        temp = vals_plot_m.sort()
-        temp = (vals_plot_m >= temp[-9])
-        vals_plot_m = vals_plot_m[temp] + [np.sum(vals_plot_m[np.logical_not(temp)])]
-        cats_plot_m = cats_plot_m[temp] + ['Others']
+        temp = np.sort(vals_plot_m).copy()
+        temp = (vals_plot_m >= temp[-8])
+        vals_plot_m = vals_plot_m[temp].tolist() + [np.sum(vals_plot_m[np.logical_not(temp)])]
+        cats_plot_m = cats_plot_m[temp].tolist() + ['Others']
     vals_plot_p = np.array(val_plus)[np.array(val_plus) > 0]
     cats_plot_p = np.array(d2[x])[np.array(val_plus) > 0]
     if len(vals_plot_p) > 9:
-        temp = vals_plot_p.sort()
-        temp = (vals_plot_p >= temp[-9])
-        vals_plot_p = vals_plot_p[temp] + [np.sum(vals_plot_p[np.logical_not(temp)])]
-        cats_plot_p = cats_plot_p[temp] + ['Others']
+        temp = np.sort(vals_plot_p).copy()
+        temp = (vals_plot_p >= temp[-8])
+        vals_plot_p = vals_plot_p[temp].tolist() + [np.sum(vals_plot_p[np.logical_not(temp)])]
+        cats_plot_p = cats_plot_p[temp].tolist() + ['Others']
     wedges, texts = ax1.pie(vals_plot_m)
     ax1.legend(wedges, cats_plot_m, loc='center left', title='Legend', bbox_to_anchor=(1, 0, 0.5, 1))  # formatting
     ax1.set_title(x + ' for Minus')
