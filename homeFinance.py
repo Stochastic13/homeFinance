@@ -48,6 +48,11 @@ df = pd.DataFrame.from_records(data=df,
 categories = metadata[2].split(':')[0].split(';')
 accounts = metadata[2].split(':')[1].split(';')
 payees = metadata[2].split(':')[2].split(';')
+if len(metadata[2].split(':')) == 4:  # for back-compatibility with old version databases without opening balances
+    opens = metadata[2].split(':')[3].split(';')
+    opens = [float(x) for x in opens]  # convert to floats
+else:
+    opens = [0 for x in accounts]  # defaults to no opening balances
 t_count = int(metadata[1])
 assert t_count == df.shape[0], "Corrupt metadata or database size mismatch."
 t_last = metadata[3]
@@ -190,7 +195,13 @@ def rem_category(event=None):
 
 def add_account(event=None):
     accounts.append(new_account.get())
+    try:
+        f = float(new_open.get())
+    except ValueError:
+        f = 0
+    opens.append(f)
     new_account.delete(0, END)
+    new_open.delete(0, END)
     del_sel_acc.set('')
     del_account['menu'].delete(0, END)
     from_m['menu'].delete(0, END)  # needs both menu_alter and this explicit reset
@@ -204,6 +215,8 @@ def add_account(event=None):
 
 
 def rem_account(event=None):
+    #  remove transactions pertaining to this account too (or keep orphaned transactions?)
+    temp = opens.pop(accounts.index(del_sel_acc.get()))
     accounts.remove(del_sel_acc.get())
     del_sel_acc.set('')
     del_account['menu'].delete(0, END)
@@ -307,12 +320,12 @@ def numeric_analyze(event=None):  # analyze and summarize the data numericaly
     for i in accounts:
         labs[0] += (i + '\n')  # account name
         df_spec = df_start.loc[df_start['From'] == i, :]  # all transactions from this account
-        # opening is calculating the sum of all transactions till this date: actual opening balance has to be added
-        # by a backdated transaction, backdated enough to not overlap with any of the analysis date ranges
+        # opening is calculating the sum of all transactions till this date and the overall opening balance
         opening = (-np.sum(df_spec.loc[df_spec['Type'].isin(['Transfer', 'Minus']), 'Amount']) + np.sum(
             df_spec.loc[df_spec['Type'] == 'Plus', 'Amount']) + np.sum(
             df_start.loc[np.logical_and(df_start['To'] == i, df_start['Type'] == 'Transfer'), 'Amount']))
-        labs[1] += str(opening) + '\n'  # opening balance
+        opening += opens[accounts.index(i)]  # add the overall opening balance for the account
+        labs[1] += str(opening) + '\n'  # opening balance as of the date range
         df_spec2 = df_sub.loc[df_sub['From'] == i, :]  # date range transactions from this account
         cnt = (df_spec2.shape[0] + df_sub.loc[np.logical_and(df_sub['Type'] == 'Transfer', df_sub['To'] == i)].shape[0])
         labs[2] += str(cnt) + '\n'  # no of transactions
@@ -321,7 +334,7 @@ def numeric_analyze(event=None):  # analyze and summarize the data numericaly
             df_sub.loc[np.logical_and(df_sub['To'] == i, df_sub['Type'] == 'Transfer'), 'Amount']))
         labs[4] += str(diff) + '\n'  # sum of all changes in the analysis period
         labs[3] += str(opening + diff) + '\n'  # ending balance
-        tots[1] += opening  # adds to the overall opening, diff, number of transactions and closing statistics
+        tots[1] += opening  # adds to the opening, diff, number of transactions and closing statistics
         tots[2] += cnt
         tots[3] += (opening + diff)
         tots[4] += diff
@@ -492,6 +505,7 @@ def foo_time(df_early, df_main, end, start, dates):  # for graph 4
                 df_early.loc[np.logical_and(df_early['Type'].isin(['Transfer', 'Minus']),
                                             df_early['From'] == accval), 'Amount']) + np.sum(
                 df_early.loc[np.logical_and(df_early['Type'] == 'Transfer', df_early['To'] == accval), 'Amount']))
+        accs[i][-1] += opens[i]  # original opening balance added
         xtimes[i].append(0)  # starting date is set to zero
         total[0] += accs[i][-1]
     df_main.loc[:, 'Date'] = dates.astype(float)  # use seconds since epoch for better manipulation
@@ -659,7 +673,7 @@ def export_db_func(event=None):
     else:
         try:
             with open(path2, 'w') as f:
-                s = '\n'.join([','.join(accounts), ','.join(payees), ','.join(categories)])
+                s = '\n'.join([','.join(accounts), ','.join(payees), ','.join(categories), ','.join([str(x) for x in opens])])
                 f.write(s)
             export_l_2.config(text='Successfully done!', fg='#02630c')
             root.after(3000,
@@ -695,7 +709,7 @@ def import_db_func(event=None, mode=0):
             root.after(2100, lambda: import_l_main2.config(text=txt2))
             return
         encrypt_db(import_e_main.get(), 'abcde12345'.encode(), str(time.time()), dfimport, import_metadata[1],
-                   import_metadata[4], import_metadata[2], import_metadata[3])
+                   import_metadata[4], import_metadata[2], import_metadata[3], import_metadata[5])
         import_l_main1.config(text='Successfully imported!', fg='#02630c')
         import_l_main2.config(text='(Default password: abcde12345)', fg='#02630c')
         txt1 = 'Transactions added: 0'
@@ -716,6 +730,10 @@ def import_db_func(event=None, mode=0):
             import_metadata[2] += val[0].split(',')
             import_metadata[3] += val[1].split(',')
             import_metadata[4] += val[2].split(',')
+            if len(val) == 4:  # for back-compatibility of old version databases with the opens list
+                import_metadata[5] += val[3].split(',')
+            else:
+                import_metadata[5] += [0 for x in val[0].split(',')]  # defaults to no opening balances
             txt2 = 'Accounts-Payees-Categories added: ' + str(len(import_metadata[2])) + '-' + str(
                 len(import_metadata[3])) + '-' + str(len(import_metadata[4]))
             import_l_main2.config(text=txt2)
@@ -746,7 +764,7 @@ def import_db_func(event=None, mode=0):
         import_metadata[2] = []
         import_metadata[3] = []
         import_metadata[4] = []
-        import_metadata[5] = 0
+        import_metadata[5] = []  # opening balances
         txt1 = 'Transactions added: 0'
         txt2 = 'Accounts-Payees-Categories added: 0-0-0'
         import_l_main1.config(fg='#000000', text=txt1)
@@ -782,6 +800,7 @@ valid_entry = StringVar()
 valid_entry.set('10')
 nb = ttk.Notebook(root)
 
+# --------x---------x--------x---------x-------
 f1 = Frame(nb)
 
 title1 = Label(f1, width=25, pady=5, font=('Helvetica', 25), text='New Transactions')
@@ -884,6 +903,10 @@ b_new_account = ttk.Button(f1, text='Add New Account')
 b_new_account.bind('<Button-1>', add_account)
 new_account.grid(column=0, row=8, columnspan=2)
 b_new_account.grid(column=2, row=8)
+new_open = Entry(f1, width=25, font=('Helvetica', 12))
+l_new_open = Label(f1, font=('Helvetica', 12), text='<-Opening Balance')
+new_open.grid(column=0, row=9, columnspan=2)
+l_new_open.grid(column=2, row=9)
 
 del_sel_acc = StringVar()
 del_sel_acc.set('')
@@ -893,7 +916,9 @@ b_del_account.bind('<Button-1>', rem_account)
 del_account.grid(column=4, row=8, columnspan=2)
 b_del_account.grid(column=6, row=8)
 
+# --------x---------x--------x---------x-------
 # root.protocol('WM_DELETE_WINDOW')
+# I don't know why this comment is here. But I am scared to remove it.
 f2 = Frame(nb)
 date_range_1 = Entry(f2, width=13, font=('Helvetica', 15), bg='#d0f5c9')
 date_range_1.insert(0, time.strftime('%d/%m/%y', time.localtime(float(metadata[0]))))
@@ -965,6 +990,7 @@ del_trans_l.grid(row=2, column=3, columnspan=3)
 del_trans_e.grid(row=2, column=2, columnspan=2)
 del_trans_b.grid(row=2, column=0, columnspan=2)
 
+# --------x---------x--------x---------x-------
 f4 = Frame(nb)
 date_start = Entry(f4, width=13, font=('Helvetica', 15), bg='#d0f5c9')
 date_start.insert(0, time.strftime('%d/%m/%y', time.localtime(float(metadata[0]))))
@@ -1028,6 +1054,7 @@ payee_numeric.grid(row=6, column=0, columnspan=4)
 category_numeric.grid(row=6, column=4, columnspan=4)
 numeric_analyze()
 
+# --------x---------x--------x---------x-------
 f5 = Frame(nb)
 date_start_2 = Entry(f5, width=13, font=('Helvetica', 15), bg='#d0f5c9')
 date_start_2.insert(0, time.strftime('%d/%m/%y', time.localtime(float(metadata[0]))))
@@ -1054,6 +1081,7 @@ for i in range(5):
     load_buttons[-1].grid(row=1, column=i)
 graphical_analyze(but=0)
 
+# --------x---------x--------x---------x-------
 f6 = Frame(nb)
 # add non-default name options, add better checking of the path, case sensitivity in imported names, remove repeats?
 # confirm and then give ovewrite support
@@ -1107,6 +1135,7 @@ import_b_1.bind('<Button-1>', lambda x=None: import_db_func(x, mode=1))
 import_b_2.bind('<Button-1>', lambda x=None: import_db_func(x, mode=2))
 import_b_main2.bind('<Button-1>', lambda x=None: import_db_func(x, mode=3))
 
+# --------x---------x--------x---------x-------
 f7 = Frame(nb)
 main_p_l = Label(f7, text='Change Password', font=('Helvetica', 30))
 old_p_l = Label(f7, text='Enter Current Password: ', font=('Lucida Console', 15), padx=40)
@@ -1126,6 +1155,7 @@ cnf_p_e.grid(row=3, column=1)
 main_p_b.grid(row=4, column=0, columnspan=2)
 main_p_b.bind('<Button-1>', password_change)
 
+# --------x---------x--------x---------x-------
 f8 = Frame(nb)
 Label(f8, text='Developed by: Stochastic13', font=('Lucida Console', 16)).pack(fill=BOTH, expand=True)
 lnk = 'https://github.com/Stochastic13/homeFinance'
@@ -1144,5 +1174,5 @@ nb.pack()
 root.mainloop()
 
 if input('Save (y/everything else): ').lower() == 'y':
-    encrypt_db(dbpath, p, metadata[0], df, t_count, categories, accounts, payees)
+    encrypt_db(dbpath, p, metadata[0], df, t_count, categories, accounts, payees, opens)
     quit(0)

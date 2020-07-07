@@ -77,7 +77,7 @@ On quitting the option of saving shall come up in the console. Please do not ski
 2. ~Export database as csv~
 3. ~Change Password~
 4. Save button in the UI and auto-save
-5. Support for adding opening balance when adding a new Account (**As of now, add a backdated Plus entry and always start analysis after the date of this entry**)
+5. ~Support for adding opening balance when adding a new Account (**As of now, add a backdated Plus entry and always start analysis after the date of this entry**)~
 6. **Better Documentation** ~and updated readme~
 #### Maybe upcoming
 0. ~Import database data~

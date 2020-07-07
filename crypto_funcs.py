@@ -19,8 +19,8 @@ def new_db():
         print('Passwords do not match')
     salt = os.urandom(16)  # cryptographic salt to protect against rainbow table attacks
     dbpath = input('Path/Name for the new db: ')  # path for the new database
-    # metadata = database created timestamp, total transactions included, categories:accounts:payees, last opened time
-    metadata = str(time.time()) + ',' + '0' + ',' + 'Misc:Cash:Misc' + ',' + str(time.time()) + '\n'
+    # metadata = creation timestamp, total transactions included, categories:accounts:payees:opens, last opened time
+    metadata = str(time.time()) + ',' + '0' + ',' + 'Misc:Cash:Misc:0' + ',' + str(time.time()) + '\n'
     kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
     key = base64.urlsafe_b64encode(kdf.derive(p))  # remove problematic characters
     f_obj = Fernet(key)  # symmetric encyption
@@ -50,10 +50,11 @@ def decrypt_db(dbpath):
     return mainfile, p
 
 
-def encrypt_db(dbpath, password, sdate, df, t_count, categories, accounts, payees):
+def encrypt_db(dbpath, password, sdate, df, t_count, categories, accounts, payees, opens):
     salt = os.urandom(16)  # a new salt every time the database is saved
+    opens = [str(x) for x in opens]  # convert to strings
     metadata = sdate + ',' + str(t_count) + ',' + ':'.join(
-        [';'.join(categories), ';'.join(accounts), ';'.join(payees)]) + ',' + str(time.time()) + '\n'
+        [';'.join(categories), ';'.join(accounts), ';'.join(payees), ';'.join(opens)]) + ',' + str(time.time()) + '\n'
     kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
     key = base64.urlsafe_b64encode(kdf.derive(password))
     f_obj = Fernet(key)
