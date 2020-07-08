@@ -9,6 +9,7 @@ import pandas as pd
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.gridspec import GridSpec
+import webbrowser  # for direct link opening in the about page
 
 # check if creating a new database or using old one
 new = True
@@ -19,7 +20,7 @@ if len(sys.argv) < 2:
     new = True
 elif len(sys.argv) == 2:
     dbpath = sys.argv[1]
-    new = False  # Using old one
+    new = False  # Using old database
 else:
     print('Too many arguments given. Press Enter to quit.')
     input()  # so that the cmd does not close before allowing the user to read the error
@@ -802,7 +803,6 @@ nb = ttk.Notebook(root)
 
 # --------x---------x--------x---------x-------
 f1 = Frame(nb)
-
 title1 = Label(f1, width=25, pady=5, font=('Helvetica', 25), text='New Transactions')
 title1.grid(column=0, row=0, columnspan=6)
 date1 = Entry(f1, width=13, bg='#d0f5c9', font=('Helvetica', 12))
@@ -907,6 +907,10 @@ new_open = Entry(f1, width=25, font=('Helvetica', 12))
 l_new_open = Label(f1, font=('Helvetica', 12), text='<-Opening Balance')
 new_open.grid(column=0, row=9, columnspan=2)
 l_new_open.grid(column=2, row=9)
+txt = '''Deleting accounts/categories/payees with existing transactions can have errors/unexpected consequences.
+Strongly advised to delete the involved transactions before deleting them.'''
+warning_del = Label(f1, font=('Helvetica', 10), text=txt, pady=30)
+warning_del.grid(column=0, row=10, columnspan=6)
 
 del_sel_acc = StringVar()
 del_sel_acc.set('')
@@ -1157,11 +1161,15 @@ main_p_b.bind('<Button-1>', password_change)
 
 # --------x---------x--------x---------x-------
 f8 = Frame(nb)
-Label(f8, text='Developed by: Stochastic13', font=('Lucida Console', 16)).pack(fill=BOTH, expand=True)
+Label(f8, text='Developed by: Stochastic13', font=('Lucida Console', 16), cursor='heart').pack(fill=BOTH, expand=True)
 lnk = 'https://github.com/Stochastic13/homeFinance'
-Label(f8, text='For more app-details, source code, documentation, license and to get the latest/old releases:\n' + lnk,
-      font=('Lucida Console', 12)).pack(fill=BOTH, expand=True, pady=(100, 0))
+Label(f8, text='For more app-details, source code, documentation, license and to get the latest/old releases:',
+      font=('Lucida Console', 15), cursor='heart').pack(fill=BOTH, expand=False)
+link_label = Label(f8, text=lnk, fg='blue', font='Helvetica 15 underline', cursor='hand2')
+link_label.pack(fill=BOTH, expand=False, pady=(0, 100))
+link_label.bind('<Button-1>', lambda x=None: webbrowser.open_new(lnk))
 
+# --------x---------x--------x---------x-------
 nb.add(f1, text='Entry form')
 nb.add(f2, text='View')
 nb.add(f4, text='Numeric')
@@ -1175,4 +1183,5 @@ root.mainloop()
 
 if input('Save (y/everything else): ').lower() == 'y':
     encrypt_db(dbpath, p, metadata[0], df, t_count, categories, accounts, payees, opens)
+    print('Saved!')
     quit(0)
