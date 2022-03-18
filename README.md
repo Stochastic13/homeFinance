@@ -2,6 +2,9 @@
 
 This is the homepage of a homegrown finance app for home finances, meant for all open-source & homely homies homing about in a quest for a tool to manage their finances. :)
 
+
+**Current Status**: Repository has been inactive for a while but a random surge in motivation for the developer to suddenly make it active with tons of improvements is due! The surge is approaching.
+
 ### Why should I use this app?
 I am very glad you asked. Really. Well, there are tons of reasons. Here are some of the good ones:
 
